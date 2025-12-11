@@ -1,34 +1,6 @@
---
--- PostgreSQL database dump
---
+-- Table: wavzedemo.transaction
 
-\restrict Jl89qDIhZmnp7prykrbfrHDcMjwMc506AkcykYPKwIu1xXQqACFFqrIWENIG4g1
-
--- Dumped from database version 17.6
--- Dumped by pg_dump version 18.0
-
--- Started on 2025-12-11 13:54:34
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- TOC entry 234 (class 1259 OID 24873)
--- Name: transaction; Type: TABLE; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
---
+-- DROP TABLE IF EXISTS wavzedemo.transaction;
 
 CREATE TABLE wavzedemo.transaction (
     transaction_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -71,48 +43,317 @@ ALTER TABLE ONLY wavzedemo.transaction
 
 CREATE TRIGGER inactive_status BEFORE INSERT OR UPDATE ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_active_check();
 
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.transaction_active_check()
 
---
+-- DROP FUNCTION IF EXISTS wavzedemo.transaction_active_check();
+
+CREATE OR REPLACE FUNCTION wavzedemo.transaction_active_check()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+BEGIN
+	IF UPPER(TRIM(NEW.milestone)) LIKE ('CLOSED%') OR UPPER(TRIM(NEW.milestone)) LIKE ('FUNDED%')
+		THEN NEW.active := FALSE;
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- TOC entry 4262 (class 2620 OID 26166)
 -- Name: transaction set_product_id; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
 CREATE TRIGGER set_product_id BEFORE INSERT OR UPDATE ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.product_id_lookup();
 
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.product_id_lookup()
 
---
+-- DROP FUNCTION IF EXISTS wavzedemo.product_id_lookup();
+
+CREATE OR REPLACE FUNCTION wavzedemo.product_id_lookup()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+DECLARE
+	v_product_id UUID;
+BEGIN
+	-- only perform lookup if product_category and product_name is provided
+	IF NEW.product_category IS NOT NULL AND NEW.product_name IS NOT NULL THEN
+		-- lookup product_id from product table
+		SELECT 
+			p.product_id
+		INTO
+			v_product_id
+		FROM wavzedemo.product p
+		WHERE p.product_category = NEW.product_category
+		AND p.product_name = NEW.product_name;
+
+		-- if product found, populate ID
+		IF FOUND THEN
+			NEW.product_id := v_product_id;
+		ELSE
+			-- raise an error
+			RAISE EXCEPTION 'Product_ID not found for product_name %', NEW.product_name;
+		END IF;
+	ELSE
+		-- if product_name is NULL, clear product_id
+		NEW.product_id := NULL;
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- TOC entry 4263 (class 2620 OID 24949)
 -- Name: transaction transaction_created_ts; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
 CREATE TRIGGER transaction_created_ts BEFORE INSERT ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.set_created_ts();
 
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.set_created_ts()
 
---
+-- DROP FUNCTION IF EXISTS wavzedemo.set_created_ts();
+
+CREATE OR REPLACE FUNCTION wavzedemo.set_created_ts()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    STABLE NOT LEAKPROOF
+AS $BODY$
+BEGIN
+	IF NEW.created_ts IS NULL THEN
+		NEW.created_ts := CURRENT_TIMESTAMP;
+	END IF;
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- TOC entry 4264 (class 2620 OID 26184)
 -- Name: transaction transaction_dup_flag; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
 CREATE TRIGGER transaction_dup_flag AFTER INSERT OR UPDATE ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_dup_check();
 
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.transaction_dup_check()
 
---
+-- DROP FUNCTION IF EXISTS wavzedemo.transaction_dup_check();
+
+CREATE OR REPLACE FUNCTION wavzedemo.transaction_dup_check()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+DECLARE
+--	v_time_window INTERVAL := '1 day'; replace intervals with current active status
+	v_duplicate_count INTEGER;
+BEGIN
+	-- check for existing transactions with same customer_id and product_id within specified time window
+	SELECT COUNT(*) 
+	INTO v_duplicate_count
+	FROM wavzedemo.transaction
+	WHERE customer_id = NEW.customer_id
+	AND product_id = NEW.product_id
+	AND active = TRUE
+--	AND created_ts BETWEEN (NEW.created_ts - v_time_window) AND (NEW.created_ts + v_time_window)
+	;
+
+	-- if duplcates found, set duplicate = 1
+	IF v_duplicate_count > 0 THEN NEW.duplicate := TRUE;
+
+		-- update existing duplicate transactions to flag
+		UPDATE wavzedemo.transaction
+		SET duplicate = TRUE
+		WHERE customer_id = NEW.customer_id
+		AND product_id = NEW.product_id
+		AND active = TRUE
+		AND transaction_id != NEW.transaction_id
+--		AND created_ts BETWEEN (NEW.created_ts - v_time_window) AND (NEW.created_ts + v_time_window)
+		AND duplicate = FALSE;  -- only update if not already flagged
+	ELSE
+		-- no duplicates found, ensure duplicate = 0
+		NEW.duplicate := FALSE;
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- TOC entry 4265 (class 2620 OID 26189)
 -- Name: transaction transaction_id_detail; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
 CREATE TRIGGER transaction_id_detail BEFORE INSERT ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_detail_uui();
 
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.transaction_detail_uui()
 
---
+-- DROP FUNCTION IF EXISTS wavzedemo.transaction_detail_uui();
+
+CREATE OR REPLACE FUNCTION wavzedemo.transaction_detail_uui()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+BEGIN
+	INSERT INTO wavzedemo.transaction_detail (transaction_id)
+	VALUES (NEW.transaction_id);
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- TOC entry 4266 (class 2620 OID 28248)
 -- Name: transaction transaction_track_history; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
 CREATE TRIGGER transaction_track_history AFTER INSERT OR DELETE OR UPDATE ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.track_transaction1_field_changes();
 
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.track_transaction1_field_changes()
 
---
+-- DROP FUNCTION IF EXISTS wavzedemo.track_transaction1_field_changes();
+
+CREATE OR REPLACE FUNCTION wavzedemo.track_transaction1_field_changes()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+DECLARE
+	field_name TEXT;
+	field_type TEXT;
+	old_val JSONB;
+	new_val JSONB;
+	old_json JSONB;
+	new_json JSONB;
+	col_info RECORD;
+BEGIN
+	-- convert rows to JSONB for easier field access and type preservation
+	IF TG_OP = 'UPDATE' THEN
+		old_json := row_to_json(OLD)::JSONB;
+		new_json := row_to_json(NEW)::JSONB;
+	ELSIF TG_OP = 'INSERT' THEN
+		new_json := row_to_json(NEW)::JSONB;
+	ELSIF TG_OP = 'DELETE' THEN
+		old_json := row_to_json(OLD)::JSONB;
+	END IF;
+
+	-- get column info for transaction table
+	FOR col_info IN
+		SELECT
+			column_name,
+			data_type,
+			udt_name
+		FROM information_schema.columns
+		WHERE table_schema = 'wavzedemo'
+		AND table_name = 'transaction'
+		AND column_name NOT IN ('transaction_id','created_ts','created_by','modified_ts','modified_by')
+	LOOP
+		field_name := col_info.column_name;
+		field_type := col_info.data_type;
+
+		-- INSERT operation
+		IF TG_OP = 'INSERT' THEN
+			new_val := new_json->field_name; 
+
+			-- only record non-NULL values
+			IF new_val IS NOT NULL AND new_val != 'null'::JSONB THEN
+				INSERT INTO wavzedemo.transaction_hist (
+					transaction_id,
+					operation,
+					field_name,
+					field_type,
+					new_value,
+					modified_ts
+				) VALUES (
+					NEW.transaction_id,
+					'INSERT',
+					field_name,
+					field_type,
+					new_val,
+					CURRENT_TIMESTAMP
+				);
+			END IF;
+
+		-- UPDATE operation
+		ELSIF TG_OP = 'UPDATE' THEN
+			old_val := old_json->field_name;
+			new_val := new_json->field_name;
+
+			-- check if value changed
+			IF old_val IS DISTINCT FROM new_val THEN
+				INSERT INTO wavzedemo.transaction_hist (
+					transaction_id,
+					operation,
+					field_name,
+					field_type,
+					old_value,
+					new_value,
+					modified_ts
+				) VALUES (
+					NEW.transaction_id,
+					'UPDATE',
+					field_name,
+					field_type,
+					old_val,
+					new_val,
+					CURRENT_TIMESTAMP
+				);
+			END IF;
+		
+		-- DELETE operation
+		ELSIF TG_OP = 'DELETE' THEN
+			old_val := old_json->field_name;
+
+			INSERT INTO wavzedemo.transaction_hist (
+				transaction_id,
+				operation,
+				field_name,
+				field_type,
+				old_value,
+				modified_ts
+			) VALUES (
+				OLD.transaction_id,
+				'DELETE',
+				field_name,
+				field_type,
+				old_val,
+				CURRENT_TIMESTAMP
+			);
+		END IF;
+	END LOOP;
+
+	-- return appropriate record
+	IF TG_OP = 'DELETE' THEN
+		RETURN OLD;
+	ELSE
+		RETURN NEW;
+	END IF;
+END;
+	
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- TOC entry 4257 (class 2606 OID 25666)
 -- Name: transaction customer_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
@@ -158,13 +399,4 @@ GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.transaction TO "kevin.soderholm@taranginc.com";
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.transaction TO "jagadeesh.pasupulati@taranginc.com";
 GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.transaction TO "wavzedemo@wavzedemodb2";
-
-
--- Completed on 2025-12-11 13:54:35
-
---
--- PostgreSQL database dump complete
---
-
-\unrestrict Jl89qDIhZmnp7prykrbfrHDcMjwMc506AkcykYPKwIu1xXQqACFFqrIWENIG4g1
 

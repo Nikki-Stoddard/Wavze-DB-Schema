@@ -1,34 +1,6 @@
---
--- PostgreSQL database dump
---
+-- Table: wavzedemo.transaction_hist
 
-\restrict I2OPse1h2ezMPQTarpP0rjr4ubagBh3foTpBQr21GLQ0sgGylLyVrnzeHcXQ1A8
-
--- Dumped from database version 17.6
--- Dumped by pg_dump version 18.0
-
--- Started on 2025-12-11 13:55:31
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- TOC entry 300 (class 1259 OID 28250)
--- Name: transaction_hist; Type: TABLE; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
---
+-- DROP TABLE IF EXISTS wavzedemo.transaction_hist;
 
 CREATE TABLE wavzedemo.transaction_hist (
     transaction_hist_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -61,8 +33,43 @@ ALTER TABLE ONLY wavzedemo.transaction_hist
 
 CREATE TRIGGER last_modified_to_transaction AFTER INSERT ON wavzedemo.transaction_hist FOR EACH ROW EXECUTE FUNCTION wavzedemo.update_transaction_last_modified();
 
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.update_transaction_last_modified()
 
---
+-- DROP FUNCTION IF EXISTS wavzedemo.update_transaction_last_modified();
+
+CREATE OR REPLACE FUNCTION wavzedemo.update_transaction_last_modified()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+DECLARE
+	v_latest_hist RECORD;
+BEGIN
+	-- get the latest history record for transaction_id 
+	SELECT
+		modified_ts,
+		modified_by
+	INTO v_latest_hist
+	FROM wavzedemo.transaction_hist
+	WHERE transaction_id = NEW.transaction_id
+	ORDER BY modified_ts DESC, transaction_hist_id DESC
+	LIMIT 1;
+
+	-- update transaction table with latest modified 
+	UPDATE wavzedemo.transaction
+	SET
+		modified_ts = COALESCE(v_latest_hist.modified_ts, CURRENT_TIMESTAMP),
+		modified_by = v_latest_hist.modified_by
+	WHERE transaction_id = NEW.transaction_id;
+
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- TOC entry 4254 (class 2606 OID 28258)
 -- Name: transaction_hist modified_by; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
@@ -78,13 +85,4 @@ ALTER TABLE ONLY wavzedemo.transaction_hist
 
 ALTER TABLE ONLY wavzedemo.transaction_hist
     ADD CONSTRAINT transaction_id FOREIGN KEY (transaction_id) REFERENCES wavzedemo.transaction(transaction_id);
-
-
--- Completed on 2025-12-11 13:55:32
-
---
--- PostgreSQL database dump complete
---
-
-\unrestrict I2OPse1h2ezMPQTarpP0rjr4ubagBh3foTpBQr21GLQ0sgGylLyVrnzeHcXQ1A8
 
