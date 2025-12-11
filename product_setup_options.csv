@@ -1,0 +1,117 @@
+product_category,product_name
+Mortgage Purchase,30yr Fixed
+Mortgage Purchase,20yr Fixed
+Mortgage Purchase,15yr Fixed
+Mortgage Purchase,10yr Fixed
+Mortgage Purchase,5/1 ARM
+Mortgage Purchase,7/1 ARM
+Mortgage Purchase,10/1 ARM
+Mortgage Purchase,5/6 ARM
+Mortgage Purchase,7/6 ARM
+Mortgage Purchase,10/6 ARM
+Mortgage Purchase,Hybrid ARM
+Mortgage Purchase,High-Balance ARM
+Mortgage Purchase,Jumbo
+Mortgage Purchase,FHA 203(b) Purchase
+Mortgage Purchase,FHA 203(b) Condo Purchase
+Mortgage Purchase,FHA Streamline Refinance
+Mortgage Purchase,FHA Cashout Refinance
+Mortgage Purchase,FHA 203(k) Renovation Standard
+Mortgage Purchase,FHA203(k) Renovation Limited
+Mortgage Purchase,FHA 203(h) Disaster Victim
+Mortgage Purchase,FHA 3/1 ARM
+Mortgage Purchase,FHA 5/1 ARM
+Mortgage Purchase,FHA 7/1 ARM
+Mortgage Purchase,FHA 10/1 ARM
+Mortgage Purchase,FHA Energy Efficient Mortgage (EEM)
+Mortgage Purchase,FHA Title II Manufactured Home Loan
+Mortgage Purchase,VA Purchase Loan
+Mortgage Purchase,VA IRRRL (Streamline)
+Mortgage Purchase,VA Cash-Out Refinance
+Mortgage Purchase,VA Purchase Loan Jumbo
+Mortgage Purchase,VA IRRRL Jumbo (Streamline)
+Mortgage Purchase,VA Cash-Out Refinance Jumbo
+Mortgage Purchase,VA Construction
+Mortgage Purchase,VA Energy Efficient Mortage (EEM)
+Mortgage Purchase,VA Manufactured Home
+Mortgage Purchase,VA Renovation Loans
+Mortgage Refinance,30yr Fixed
+Mortgage Refinance,20yr Fixed
+Mortgage Refinance,15yr Fixed
+Mortgage Refinance,10yr Fixed
+Mortgage Refinance,5/1 ARM
+Mortgage Refinance,7/1 ARM
+Mortgage Refinance,10/1 ARM
+Mortgage Refinance,5/6 ARM
+Mortgage Refinance,7/6 ARM
+Mortgage Refinance,10/6 ARM
+Mortgage Refinance,Hybrid ARM
+Mortgage Refinance,High-Balance ARM
+Mortgage Refinance,Jumbo
+Mortgage Refinance,FHA 3/1 ARM
+Mortgage Refinance,FHA 5/1 ARM
+Mortgage Refinance,FHA 7/1 ARM
+Mortgage Refinance,FHA 10/1 ARM
+Mortgage Refinance,FHA Energy Efficient Mortgage (EEM)
+Mortgage Refinance,FHA Title II Manufactured Home Loan
+Mortgage Refinance,VA Energy Efficient Mortage (EEM)
+Mortgage Refinance,VA Manufactured Home
+Mortgage Refinance,VA Renovation Loans
+Home Equity Loan,Home Equity Loan
+Home Equity Loan,"Home Equity ""Cash Out"" Refinance"
+Home Equity Loan,High-LTV Home Equity
+Home Equity Line,Home Equity Line of Credit
+Home Equity Line,Hybrid HELOC
+Home Equity Line,High-LTV Home Equity
+Home Equity Line,HELOC (Investment Property)
+Home Equity Line,Interest-Only HELOC
+Personal Loan,Personal Loan (Unsecured)
+Personal Loan,Personal Loan (Secured)
+Personal Loan,Debt Consolidation Loan
+Personal Loan,Home Improvement Loan
+Personal Loan,Medical/Health Care Personal Loan
+Personal Loan,Emergency Loan
+Personal Line,Personal Line of Credit (PLOC)
+Personal Line,Overdraft Line of Credit
+Personal Line,Secured Personal Line of Credit
+Student Loan,Private Student Loan
+Student Loan,Private Student Loan Refinance
+Student Loan,Debt Consolidation Student Loan
+Student Loan,Parent Student Loan
+Credit Card,Standard Credit Card
+Credit Card,Cash Back Rewards Card
+Credit Card,Points Reward Card
+Credit Card,Secured Credit Card
+Credit Card,Premium/Elite Card
+Credit Card,Business Card
+Credit Card,Specialty Card
+Auto Purchase,New Auto Financing
+Auto Purchase,Used Auto Financing
+Auto Purchase,Lease Buyout
+Auto Purchase,Dealer Financed
+Auto Purchase,Unsecured Financing
+Auto Purchase,Indirect Loan
+Auto Refinance,Automobile Refinance
+Recreational Purchase,New RV Loan
+Recreational Purchase,Used RV Loan
+Recreational Purchase,Boat Loan
+Recreational Purchase,Number of Boat Motors
+Recreational Purchase,All Terrain Vehicles (ATV/UTV)
+Recreational Refinance,RV Refinance
+Checking,Standard Checking
+Checking,Free Checking
+Checking,Interest Bearing Checking
+Checking,Premium/High Tier Checking
+Checking,Business Checking
+Savings,Standard Savings
+Savings,High Yield Savings Account (HYSA)
+Savings,Rewards Savings
+Savings,Business Savings
+Certificate of Deposit (CD),Standard CD
+Certificate of Deposit (CD),High-Yield CD
+Certificate of Deposit (CD),Bump-Up/Step Up CD
+Certificate of Deposit (CD),IRA CD
+Money Market,Standard Money Market Account
+Money Market,High Yield Money Market Account
+Money Market,Premium Money Market Account
+Money Market,Business Money Market Account

@@ -1,0 +1,95 @@
+product category,field name,field_sequence,field_active
+Mortgage Purchase,purchase_price,1,TRUE
+Mortgage Purchase,down_payment,2,TRUE
+Mortgage Purchase,loan_amount,3,TRUE
+Mortgage Purchase,loan_term_type,4,TRUE
+Mortgage Purchase,loan_term,5,TRUE
+Mortgage Purchase,pmi,6,TRUE
+Mortgage Purchase,lien_position,7,TRUE
+Mortgage Purchase,rate_type,8,TRUE
+Mortgage Purchase,interest_rate,9,TRUE
+Mortgage Purchase,ownership_type,10,TRUE
+Mortgage Refinance,loan_amount,1,TRUE
+Mortgage Refinance,loan_term_type,2,TRUE
+Mortgage Refinance,loan_term,3,TRUE
+Mortgage Refinance,cash_out,4,TRUE
+Mortgage Refinance,lien_position,5,TRUE
+Mortgage Refinance,rate_type,6,TRUE
+Mortgage Refinance,interest_rate,7,TRUE
+Mortgage Refinance,ownership_type,8,TRUE
+Home Equity Loan,loan_amount,1,TRUE
+Home Equity Loan,loan_term_type,2,TRUE
+Home Equity Loan,loan_term,3,TRUE
+Home Equity Loan,lien_position,4,TRUE
+Home Equity Loan,rate_type,5,TRUE
+Home Equity Loan,interest_rate,6,TRUE
+Home Equity Loan,ownership_type,7,TRUE
+Home Equity Line,loan_amount,1,TRUE
+Home Equity Line,loan_term_type,2,TRUE
+Home Equity Line,loan_term,3,TRUE
+Home Equity Line,draw_amount,4,TRUE
+Home Equity Line,lien_position,5,TRUE
+Home Equity Line,rate_type,6,TRUE
+Home Equity Line,interest_rate,7,TRUE
+Home Equity Line,ownership_type,8,TRUE
+Personal Loan,loan_amount,1,TRUE
+Personal Loan,loan_term_type,2,TRUE
+Personal Loan,loan_term,3,TRUE
+Personal Loan,rate_type,4,TRUE
+Personal Loan,interest_rate,5,TRUE
+Personal Line,loan_amount,1,TRUE
+Personal Line,loan_term_type,2,TRUE
+Personal Line,loan_term,3,TRUE
+Personal Line,draw_amount,4,TRUE
+Personal Line,rate_type,5,TRUE
+Personal Line,interest_rate,6,TRUE
+Student Loan,loan_amount,1,TRUE
+Student Loan,loan_term_type,2,TRUE
+Student Loan,loan_term,3,TRUE
+Student Loan,rate_type,4,TRUE
+Student Loan,interest_rate,5,TRUE
+Credit Card,credit limit,1,TRUE
+Credit Card,apr,2,TRUE
+Credit Card,cash_advance,3,TRUE
+Auto Purchase,purchase_price,1,TRUE
+Auto Purchase,down_payment,2,TRUE
+Auto Purchase,loan_amount,3,TRUE
+Auto Purchase,loan_term_type,4,TRUE
+Auto Purchase,loan_term,5,TRUE
+Auto Purchase,rate_type,6,TRUE
+Auto Purchase,interest_rate,7,TRUE
+Auto Refinance,loan_amount,1,TRUE
+Auto Refinance,loan_term_type,2,TRUE
+Auto Refinance,loan_term,3,TRUE
+Auto Refinance,rate_type,4,TRUE
+Auto Refinance,interest_rate,5,TRUE
+Recreational Purchase,purchase_price,1,TRUE
+Recreational Purchase,down_payment,2,TRUE
+Recreational Purchase,loan_amount,3,TRUE
+Recreational Purchase,loan_term_type,4,TRUE
+Recreational Purchase,loan_term,5,TRUE
+Recreational Purchase,rate_type,6,TRUE
+Recreational Purchase,interest_rate,7,TRUE
+Recreational Refinance,loan_amount,1,TRUE
+Recreational Refinance,loan_term_type,2,TRUE
+Recreational Refinance,loan_term,3,TRUE
+Recreational Refinance,rate_type,4,TRUE
+Recreational Refinance,interest_rate,5,TRUE
+Checking,deposit_amount,1,TRUE
+Checking,funding_method,2,TRUE
+Checking,ownership_type,3,TRUE
+Savings,deposit_amount,1,TRUE
+Savings,rate_type,2,TRUE
+Savings,interest_rate,3,TRUE
+Savings,funding_method,4,TRUE
+Savings,ownership_type,5,TRUE
+Certificate of Deposit (CD),deposit_amount,1,TRUE
+Certificate of Deposit (CD),rate_type,2,TRUE
+Certificate of Deposit (CD),interest_rate,3,TRUE
+Certificate of Deposit (CD),funding_method,4,TRUE
+Certificate of Deposit (CD),ownership_type,5,TRUE
+Money Market,deposit_amount,1,TRUE
+Money Market,rate_type,2,TRUE
+Money Market,interest_rate,3,TRUE
+Money Market,funding_method,4,TRUE
+Money Market,ownership_type,5,TRUE
