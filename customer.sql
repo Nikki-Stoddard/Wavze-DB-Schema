@@ -1,5 +1,6 @@
 --
 -- PostgreSQL database dump
+-- add trigger functions in separate doc
 --
 
 \restrict 4jMFstEAvrFcnFqf87J0ZXT3jUhEWeqPoGYiHAlFBs2W6mMDNSBF07bfffADizh
