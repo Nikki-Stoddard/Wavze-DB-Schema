@@ -1,34 +1,6 @@
---
--- PostgreSQL database dump
---
+-- Table: wavzedemo.customer_hist
 
-\restrict MWmPejBPp5AdZBpxPj0u9TAC46r4w7m6JC6EWj50r7iKfwNhG9ARhrkIGWwRa6f
-
--- Dumped from database version 17.6
--- Dumped by pg_dump version 18.0
-
--- Started on 2025-12-11 13:45:53
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- TOC entry 258 (class 1259 OID 26128)
--- Name: customer_hist; Type: TABLE; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
---
+-- DROP TABLE IF EXISTS wavzedemo.customer_hist;
 
 CREATE TABLE wavzedemo.customer_hist (
     customer_hist_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -61,8 +33,43 @@ ALTER TABLE ONLY wavzedemo.customer_hist
 
 CREATE TRIGGER last_modified_to_customer AFTER INSERT ON wavzedemo.customer_hist FOR EACH ROW EXECUTE FUNCTION wavzedemo.update_customer_last_modified();
 
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.update_customer_last_modified()
 
---
+-- DROP FUNCTION IF EXISTS wavzedemo.update_customer_last_modified();
+
+CREATE OR REPLACE FUNCTION wavzedemo.update_customer_last_modified()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+DECLARE
+	v_latest_hist RECORD;
+BEGIN
+	-- get the latest history record for customer_id
+	SELECT
+		modified_ts,
+		modified_by
+	INTO v_latest_hist
+	FROM wavzedemo.customer_hist
+	WHERE customer_id = NEW.customer_id
+	ORDER BY modified_ts DESC, customer_hist_id DESC
+	LIMIT 1;
+
+	-- update customer ttable with latest modified
+	UPDATE wavzedemo.customer
+	SET
+		modified_ts = COALESCE(v_latest_hist.modified_ts, CURRENT_TIMESTAMP),
+		modified_by = v_latest_hist.modified_by
+	WHERE customer_id = NEW.customer_id;
+
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- TOC entry 4254 (class 2606 OID 26135)
 -- Name: customer_hist customer_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
@@ -87,13 +94,4 @@ ALTER TABLE ONLY wavzedemo.customer_hist
 --
 
 GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.customer_hist TO "wavzedemo@wavzedemodb2";
-
-
--- Completed on 2025-12-11 13:45:54
-
---
--- PostgreSQL database dump complete
---
-
-\unrestrict MWmPejBPp5AdZBpxPj0u9TAC46r4w7m6JC6EWj50r7iKfwNhG9ARhrkIGWwRa6f
 
