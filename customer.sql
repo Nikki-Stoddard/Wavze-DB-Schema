@@ -127,7 +127,7 @@ BEGIN
 
 	-- if duplicate found, raise an error
 	IF v_existing_customer_id IS NOT NULL THEN
-		RAISE EXCEPTION 'Duplicate customer found: A customer with name "%, email "%, and phone "% already exists (customer_id: %, uuid: %)', NEW.name, NEW.email, NEW.phone, v_existing_customer_id, v_existing_uuid;
+		RAISE EXCEPTION 'Duplicate customer found: A customer with name "%, email "%, and phone "% already exists (customer_id: %, uuid: %)', NEW.name, NEW.email, NEW.phone, v_existing_customer_id, v_existing_uuid;with first_name "%, last_name "%, email "%, phn1_nbr "%," and phn2_nbr "% already exists (customer_id: %, uuid: %)', NEW.first_name, NEW.last_name, NEW.email, NEW.phn1_nbr, NEW.phn2_nbr, v_existing_customer_id, v_existing_uuid;
 	END IF;
 
 	-- if no duplicate and uuid is not set, generate
