@@ -18,7 +18,6 @@ CREATE TABLE wavzedemo.transaction_hist (
 ALTER TABLE wavzedemo.transaction_hist OWNER TO "nikki.stoddard@taranginc.com";
 
 --
--- TOC entry 4253 (class 2606 OID 28257)
 -- Name: transaction_hist transaction_hist_pkey; Type: CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -27,7 +26,6 @@ ALTER TABLE ONLY wavzedemo.transaction_hist
 
 
 --
--- TOC entry 4256 (class 2620 OID 28269)
 -- Name: transaction_hist last_modified_to_transaction; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -70,7 +68,52 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- TOC entry 4254 (class 2606 OID 28258)
+--
+-- Name: transaction_hist set_kpi_milestone_flags; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+--
+
+CREATE TRIGGER set_kpi_milestone_flags AFTER INSERT OR UPDATE ON wavzedemo.transaction_hist FOR EACH ROW EXECUTE FUNCTION wavzedemo.kpi_milestone_flags();
+
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.kpi_milestone_flags()
+
+-- DROP FUNCTION IF EXISTS wavzedemo.kpi_milestone_flags();
+
+CREATE OR REPLACE FUNCTION wavzedemo.kpi_milestone_flags()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+BEGIN
+
+	IF NEW.field_name = 'milestone' AND UPPER(TRIM(CAST(NEW.new_value AS text))) LIKE '%APP SUB%' THEN 
+		UPDATE wavzedemo.transaction_milestone_kpi
+		SET appl_flag = 1
+		WHERE transaction_id = NEW.transaction_id;
+		
+	ELSIF NEW.field_name = 'milestone' AND UPPER(TRIM(CAST(NEW.new_value AS text))) LIKE ('%CLOSED%') THEN
+		UPDATE wavzedemo.transaction_milestone_kpi
+		SET outcome_dt = NEW.modified_ts,
+			win_flag = 0
+		WHERE transaction_id = NEW.transaction_id;
+		
+	ELSIF NEW.field_name = 'milestone' AND 
+		(UPPER(TRIM(CAST(NEW.new_value AS text))) LIKE ('%FUNDED%') 
+			OR UPPER(TRIM(CAST(NEW.new_value AS text))) LIKE ('%ACCOUNT OPEN%')) THEN 
+		UPDATE wavzedemo.transaction_milestone_kpi
+		SET outcome_dt = NEW.modified_ts,
+			win_flag = 1
+		WHERE transaction_id = NEW.transaction_id;
+	
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- Name: transaction_hist modified_by; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -79,7 +122,6 @@ ALTER TABLE ONLY wavzedemo.transaction_hist
 
 
 --
--- TOC entry 4255 (class 2606 OID 28263)
 -- Name: transaction_hist transaction_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 

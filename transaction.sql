@@ -28,7 +28,6 @@ CREATE TABLE wavzedemo.transaction (
 ALTER TABLE wavzedemo.transaction OWNER TO "nikki.stoddard@taranginc.com";
 
 --
--- TOC entry 4256 (class 2606 OID 25089)
 -- Name: transaction transaction_pkey; Type: CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -37,7 +36,6 @@ ALTER TABLE ONLY wavzedemo.transaction
 
 
 --
--- TOC entry 4261 (class 2620 OID 26199)
 -- Name: transaction inactive_status; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -65,7 +63,6 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- TOC entry 4262 (class 2620 OID 26166)
 -- Name: transaction set_product_id; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -114,7 +111,6 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- TOC entry 4263 (class 2620 OID 24949)
 -- Name: transaction transaction_created_ts; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -141,7 +137,6 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- TOC entry 4264 (class 2620 OID 26184)
 -- Name: transaction transaction_dup_flag; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -195,18 +190,17 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- TOC entry 4265 (class 2620 OID 26189)
 -- Name: transaction transaction_id_detail; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER transaction_id_detail BEFORE INSERT ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_detail_uui();
+CREATE TRIGGER transaction_id_detail BEFORE INSERT ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_detail_uuid();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.transaction_detail_uui()
+-- FUNCTION: wavzedemo.transaction_detail_uuid()
 
--- DROP FUNCTION IF EXISTS wavzedemo.transaction_detail_uui();
+-- DROP FUNCTION IF EXISTS wavzedemo.transaction_detail_uuid();
 
-CREATE OR REPLACE FUNCTION wavzedemo.transaction_detail_uui()
+CREATE OR REPLACE FUNCTION wavzedemo.transaction_detail_uuid()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -221,7 +215,31 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- TOC entry 4266 (class 2620 OID 28248)
+-- Name: transaction transaction_id_milestone_kpi; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+--
+
+CREATE TRIGGER transaction_id_milestone BEFORE INSERT ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_milestone_kpi_uuid();
+
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavzedemo.transaction_milestone_kpi_uuid()
+
+-- DROP FUNCTION IF EXISTS wavzedemo.transaction_milestone_kpi_uuid();
+
+CREATE OR REPLACE FUNCTION wavzedemo.transaction_milestone_kpi_uuid()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+BEGIN
+	INSERT INTO wavzedemo.transaction_milestone_kpi (transaction_id)
+	VALUES (NEW.transaction_id);
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+
 -- Name: transaction transaction_track_history; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -354,7 +372,6 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- TOC entry 4257 (class 2606 OID 25666)
 -- Name: transaction customer_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -363,7 +380,6 @@ ALTER TABLE ONLY wavzedemo.transaction
 
 
 --
--- TOC entry 4258 (class 2606 OID 25671)
 -- Name: transaction product_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -372,7 +388,6 @@ ALTER TABLE ONLY wavzedemo.transaction
 
 
 --
--- TOC entry 4259 (class 2606 OID 25138)
 -- Name: transaction property_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -381,7 +396,6 @@ ALTER TABLE ONLY wavzedemo.transaction
 
 
 --
--- TOC entry 4260 (class 2606 OID 25143)
 -- Name: transaction user_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -390,8 +404,6 @@ ALTER TABLE ONLY wavzedemo.transaction
 
 
 --
--- TOC entry 4421 (class 0 OID 0)
--- Dependencies: 234
 -- Name: TABLE transaction; Type: ACL; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
 --
 

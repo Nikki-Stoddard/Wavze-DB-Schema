@@ -56,6 +56,12 @@ This project contains a complete PostgreSQL database schema for managing custome
 - **transaction_hist**: Transaction change history
 - **property_hist**: Property modification history
 
+### Derived Metric Table
+- **transaction_milestone_kpi**: Banking-specific milestone KPIs (fields will change for each industry template)
+
+### Reporting Materialized View
+- **kpi_ytd_by_user**: Banking-specific aggregated milestone KPIs (fields will change for each industry template)
+
 ## Prerequisites
 
 - PostgreSQL 12 or higher
@@ -109,6 +115,8 @@ Execute the SQL files in the following order to ensure dependencies are met:
 9. **product_hist.sql** - Product history (depends on product, wavze_user)
 10. **transaction_hist.sql** - Transaction history (depends on transaction, wavze_user)
 11. **property_hist.sql** - Property history (depends on property, wavze_user)
+12. **transaction_milestone_kpi.sql** - Milestone KPI flags (depends on transaction, customer)
+13. **kpi_ytd_by_user.sql** - Aggregated KPI view 
 
 ### Using pgAdmin 4
 
@@ -135,6 +143,8 @@ psql -U your-username -d wavzedemo -f customer_hist.sql
 psql -U your-username -d wavzedemo -f product_hist.sql
 psql -U your-username -d wavzedemo -f transaction_hist.sql
 psql -U your-username -d wavzedemo -f property_hist.sql
+psql -U your-username -d wavzedemo -f transaction_milestone_kpi.sql
+psql -U your-username -d wavzedemo -f kpi_ytd_by_user.sql
 ```
 
 ## Usage
@@ -421,8 +431,10 @@ These functions automatically log all field changes to respective history tables
 
 ### Transaction Detail Auto-Creation
 
-**Function**: `wavzedemo.transaction_detail_uui()`
-- Automatically creates a corresponding `transaction_detail` record when a transaction is created
+**Functions**: 
+- `wavzedemo.transaction_detail_uuid()`
+- `wavzedemo.transaction_milestone_kpi_uuid()`
+- Automatically creates a corresponding `transaction_detail` and `transaction_milestone_kpi` record when a transaction is created
 
 ### Last Modified Updates
 
@@ -442,6 +454,66 @@ Defines which fields are active for each product category in the transaction_det
 
 ### product_setup_options.csv
 (If present) Contains product setup configuration options. This is a banking industry example and supports the client's initial setup of their Wavze application.
+
+## KPI Aggregate Views
+
+The schema includes dynamic KPI aggregate views for comprehensive transaction analytics:
+
+### kpi_aggregate_view
+
+A detailed view that provides comprehensive KPI aggregations across transactions, grouped by:
+- Product category and name
+- Milestone (transaction status)
+- Source
+- Time dimensions (date, month, quarter, year)
+
+**Key Metrics Included:**
+- Transaction counts (total, active, closed, duplicates, time-sensitive)
+- Customer metrics (unique customers, active customers)
+- Financial aggregations (loan amounts, purchase prices, deposits, credit limits)
+- Interest rate and APR statistics
+- Conversion metrics (application → approved → closed → funded rates)
+- Distribution statistics (rate types, ownership types, lien positions)
+
+### kpi_summary_view
+
+A high-level summary view that aggregates `kpi_aggregate_view` data for dashboard reporting:
+- Aggregated by product category and time periods
+- Weighted averages for financial metrics
+- Overall conversion rates
+- Active vs closed ratios
+
+### Usage Examples
+
+See `kpi_view_usage_examples.sql` for comprehensive query examples including:
+- Monthly KPI summaries by product category
+- Conversion funnel analysis
+- Source performance comparison
+- Quarter-over-quarter growth analysis
+- Product-specific KPI queries
+
+**Example Query:**
+```sql
+-- Get monthly summary for all products
+SELECT 
+    product_category,
+    transaction_month,
+    total_transactions,
+    total_loan_amount,
+    overall_approval_rate_pct,
+    overall_close_rate_pct
+FROM wavzedemo.kpi_summary_view
+WHERE transaction_month >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '12 months')
+ORDER BY product_category, transaction_month DESC;
+```
+
+### Installation
+
+Execute the KPI view files after creating the base schema:
+```bash
+psql -U your-username -d wavzedemo -f kpi_aggregate_view.sql
+psql -U your-username -d wavzedemo -f kpi_summary_view.sql
+```
 
 ## Contributing
 
