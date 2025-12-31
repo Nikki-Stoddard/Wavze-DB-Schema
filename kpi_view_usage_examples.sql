@@ -19,7 +19,7 @@ SELECT
     overall_approval_rate_pct,
     overall_close_rate_pct,
     overall_funded_rate_pct
-FROM wavzedemo.kpi_summary_view
+FROM wavze1.kpi_summary_view
 WHERE transaction_month >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '12 months')
 ORDER BY product_category, transaction_month DESC;
 
@@ -38,7 +38,7 @@ SELECT
     avg_down_payment,
     approval_rate_pct,
     close_rate_pct
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 WHERE product_category = 'Mortgage Purchase'
     AND transaction_month >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '6 months')
 ORDER BY milestone, transaction_month DESC;
@@ -57,7 +57,7 @@ SELECT
     AVG(avg_loan_amount) AS avg_loan_amount,
     AVG(approval_rate_pct) AS avg_approval_rate,
     AVG(close_rate_pct) AS avg_close_rate
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 WHERE source IS NOT NULL
     AND transaction_date >= CURRENT_DATE - INTERVAL '90 days'
 GROUP BY source, product_category
@@ -78,7 +78,7 @@ SELECT
     AVG(overall_approval_rate_pct) AS ytd_avg_approval_rate,
     AVG(overall_close_rate_pct) AS ytd_avg_close_rate,
     AVG(overall_funded_rate_pct) AS ytd_avg_funded_rate
-FROM wavzedemo.kpi_summary_view
+FROM wavze1.kpi_summary_view
 WHERE transaction_year = DATE_TRUNC('year', CURRENT_DATE)
 GROUP BY product_category
 ORDER BY ytd_transactions DESC;
@@ -96,7 +96,7 @@ SELECT
     total_loan_amount,
     avg_loan_amount,
     avg_interest_rate
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 WHERE product_category = 'Mortgage Purchase'
     AND transaction_date >= CURRENT_DATE - INTERVAL '30 days'
 ORDER BY transaction_date DESC, milestone;
@@ -115,7 +115,7 @@ SELECT
     ROUND(100.0 * SUM(approved_count)::NUMERIC / NULLIF(SUM(application_count), 0), 2) AS app_to_approved_pct,
     ROUND(100.0 * SUM(closed_count)::NUMERIC / NULLIF(SUM(approved_count), 0), 2) AS approved_to_closed_pct,
     ROUND(100.0 * SUM(funded_count)::NUMERIC / NULLIF(SUM(closed_count), 0), 2) AS closed_to_funded_pct
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 WHERE transaction_month >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '12 months')
 GROUP BY product_category, transaction_month
 ORDER BY product_category, transaction_month DESC;
@@ -132,7 +132,7 @@ SELECT
     MIN(min_interest_rate) AS min_interest_rate,
     MAX(max_interest_rate) AS max_interest_rate,
     COUNT(*) AS sample_size
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 WHERE avg_interest_rate IS NOT NULL
     AND transaction_date >= CURRENT_DATE - INTERVAL '90 days'
 GROUP BY product_category, most_common_rate_type
@@ -152,7 +152,7 @@ SELECT
         NULLIF(SUM(total_transactions), 0), 
         2
     ) AS duplicate_rate_pct
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 WHERE transaction_date >= CURRENT_DATE - INTERVAL '30 days'
 GROUP BY product_category, source
 HAVING SUM(duplicate_transactions) > 0
@@ -173,7 +173,7 @@ SELECT
         2
     ) AS time_sensitive_pct,
     AVG(close_rate_pct) AS avg_close_rate
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 WHERE transaction_date >= CURRENT_DATE - INTERVAL '90 days'
 GROUP BY product_category, milestone
 ORDER BY product_category, milestone;
@@ -191,7 +191,7 @@ SELECT
     most_common_ownership_type,
     most_common_rate_type,
     avg_interest_rate
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 WHERE product_category IN ('Checking', 'Savings', 'Certificate of Deposit (CD)', 'Money Market')
     AND transaction_month >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '12 months')
 ORDER BY product_category, transaction_month DESC;
@@ -209,7 +209,7 @@ SELECT
     AVG(avg_loan_term) AS avg_loan_term,
     AVG(approval_rate_pct) AS avg_approval_rate,
     AVG(funded_rate_pct) AS avg_funded_rate
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 WHERE product_category IN (
     'Mortgage Purchase', 
     'Mortgage Refinance', 
@@ -233,7 +233,7 @@ WITH quarterly_kpis AS (
         SUM(total_transactions) AS q_transactions,
         SUM(total_loan_amount) AS q_loan_amount,
         AVG(overall_approval_rate_pct) AS q_approval_rate
-    FROM wavzedemo.kpi_summary_view
+    FROM wavze1.kpi_summary_view
     WHERE transaction_quarter >= DATE_TRUNC('quarter', CURRENT_DATE - INTERVAL '6 months')
     GROUP BY product_category, transaction_quarter
 )

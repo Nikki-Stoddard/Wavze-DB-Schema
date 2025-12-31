@@ -1,8 +1,8 @@
--- Table: wavzedemo.product
+-- Table: wavze1.product
 
--- DROP TABLE IF EXISTS wavzedemo.product;
+-- DROP TABLE IF EXISTS wavze1.product;
 
-CREATE TABLE wavzedemo.product (
+CREATE TABLE wavze1.product (
     product_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     product_category character varying(30) NOT NULL,
     product_name character varying(50) NOT NULL,
@@ -14,30 +14,30 @@ CREATE TABLE wavzedemo.product (
 );
 
 
-ALTER TABLE wavzedemo.product OWNER TO "nikki.stoddard@taranginc.com";
+ALTER TABLE wavze1.product OWNER TO "nikki.stoddard@taranginc.com";
 
 --
 -- TOC entry 4254 (class 2606 OID 25117)
--- Name: product product_pkey; Type: CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: product product_pkey; Type: CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-ALTER TABLE ONLY wavzedemo.product
+ALTER TABLE ONLY wavze1.product
     ADD CONSTRAINT product_pkey PRIMARY KEY (product_id);
 
 
 --
 -- TOC entry 4255 (class 2620 OID 28209)
--- Name: product product_created_ts; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: product product_created_ts; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER product_created_ts BEFORE INSERT ON wavzedemo.product FOR EACH ROW EXECUTE FUNCTION wavzedemo.set_created_ts();
+CREATE TRIGGER product_created_ts BEFORE INSERT ON wavze1.product FOR EACH ROW EXECUTE FUNCTION wavze1.set_created_ts();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.set_created_ts()
+-- FUNCTION: wavze1.set_created_ts()
 
--- DROP FUNCTION IF EXISTS wavzedemo.set_created_ts();
+-- DROP FUNCTION IF EXISTS wavze1.set_created_ts();
 
-CREATE OR REPLACE FUNCTION wavzedemo.set_created_ts()
+CREATE OR REPLACE FUNCTION wavze1.set_created_ts()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -54,17 +54,17 @@ $BODY$;
 
 
 -- TOC entry 4256 (class 2620 OID 28243)
--- Name: product track_product_active; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: product track_product_active; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER track_product_active AFTER UPDATE ON wavzedemo.product FOR EACH ROW EXECUTE FUNCTION wavzedemo.track_product_field_changes();
+CREATE TRIGGER track_product_active AFTER UPDATE ON wavze1.product FOR EACH ROW EXECUTE FUNCTION wavze1.track_product_field_changes();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.track_product_field_changes()
+-- FUNCTION: wavze1.track_product_field_changes()
 
--- DROP FUNCTION IF EXISTS wavzedemo.track_product_field_changes();
+-- DROP FUNCTION IF EXISTS wavze1.track_product_field_changes();
 
-CREATE OR REPLACE FUNCTION wavzedemo.track_product_field_changes()
+CREATE OR REPLACE FUNCTION wavze1.track_product_field_changes()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -92,7 +92,7 @@ BEGIN
 			data_type,
 			udt_name
 		FROM information_schema.columns
-		WHERE table_schema = 'wavzedemo'
+		WHERE table_schema = 'wavze1'
 		AND table_name = 'product'
 		AND column_name = 'product_active'
 	LOOP
@@ -106,7 +106,7 @@ BEGIN
 
 			-- check if value changed
 			IF old_val IS DISTINCT FROM new_val THEN
-				INSERT INTO wavzedemo.product_hist (
+				INSERT INTO wavze1.product_hist (
 					product_id,
 					operation,
 					field_name,
@@ -136,11 +136,11 @@ $BODY$;
 
 -- TOC entry 4411 (class 0 OID 0)
 -- Dependencies: 235
--- Name: TABLE product; Type: ACL; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: TABLE product; Type: ACL; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.product TO "erik.michaelson@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.product TO "kevin.soderholm@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.product TO "jagadeesh.pasupulati@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.product TO "wavzedemo@wavzedemodb2";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.product TO "erik.michaelson@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.product TO "kevin.soderholm@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.product TO "jagadeesh.pasupulati@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.product TO "wavze1@wavze1db2";
 

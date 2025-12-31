@@ -1,8 +1,8 @@
--- Table: wavzedemo.wavze_user
+-- Table: wavze1.wavze_user
 
--- DROP TABLE IF EXISTS wavzedemo.wavze_user;
+-- DROP TABLE IF EXISTS wavze1.wavze_user;
 
-CREATE TABLE wavzedemo.wavze_user (
+CREATE TABLE wavze1.wavze_user (
     user_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     username character varying(10),
     preferred_name text,
@@ -32,25 +32,25 @@ CREATE TABLE wavzedemo.wavze_user (
 );
 
 
-ALTER TABLE wavzedemo.wavze_user OWNER TO "nikki.stoddard@taranginc.com";
+ALTER TABLE wavze1.wavze_user OWNER TO "nikki.stoddard@taranginc.com";
 
 --
 -- TOC entry 4253 (class 2606 OID 25105)
--- Name: wavze_user wavze_user_pkey; Type: CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: wavze_user wavze_user_pkey; Type: CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-ALTER TABLE ONLY wavzedemo.wavze_user
+ALTER TABLE ONLY wavze1.wavze_user
     ADD CONSTRAINT wavze_user_pkey PRIMARY KEY (user_id);
 
 
 --
 -- TOC entry 4408 (class 0 OID 0)
 -- Dependencies: 244
--- Name: TABLE wavze_user; Type: ACL; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: TABLE wavze_user; Type: ACL; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.wavze_user TO "erik.michaelson@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.wavze_user TO "jagadeesh.pasupulati@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.wavze_user TO "kevin.soderholm@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.wavze_user TO "wavzedemo@wavzedemodb2";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.wavze_user TO "erik.michaelson@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.wavze_user TO "jagadeesh.pasupulati@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.wavze_user TO "kevin.soderholm@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.wavze_user TO "wavze1@wavze1db2";
 

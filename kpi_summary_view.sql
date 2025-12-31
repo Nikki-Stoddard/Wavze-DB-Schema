@@ -1,13 +1,13 @@
--- View: wavzedemo.kpi_summary_view
+-- View: wavze1.kpi_summary_view
 -- 
 -- High-Level KPI Summary View
 -- 
 -- Provides aggregated KPIs at a summary level (by product category, by month, etc.)
 -- Useful for dashboard and reporting purposes
 --
--- DROP VIEW IF EXISTS wavzedemo.kpi_summary_view;
+-- DROP VIEW IF EXISTS wavze1.kpi_summary_view;
 
-CREATE OR REPLACE VIEW wavzedemo.kpi_summary_view AS
+CREATE OR REPLACE VIEW wavze1.kpi_summary_view AS
 SELECT 
     -- Dimension Fields (summary level)
     product_category,
@@ -87,21 +87,21 @@ SELECT
         ELSE NULL
     END AS active_to_closed_ratio
 
-FROM wavzedemo.kpi_aggregate_view
+FROM wavze1.kpi_aggregate_view
 GROUP BY 
     product_category,
     transaction_month,
     transaction_year;
 
 -- Add comment
-COMMENT ON VIEW wavzedemo.kpi_summary_view IS 
+COMMENT ON VIEW wavze1.kpi_summary_view IS 
 'High-level KPI summary view aggregating metrics by product category and time periods. Provides overall transaction, customer, financial, and conversion metrics for dashboard reporting.';
 
 -- Grant permissions
-GRANT SELECT ON wavzedemo.kpi_summary_view TO "erik.michaelson@taranginc.com";
-GRANT SELECT ON wavzedemo.kpi_summary_view TO "kevin.soderholm@taranginc.com";
-GRANT SELECT ON wavzedemo.kpi_summary_view TO "jagadeesh.pasupulati@taranginc.com";
-GRANT SELECT ON wavzedemo.kpi_summary_view TO "wavzedemo@wavzedemodb2";
+GRANT SELECT ON wavze1.kpi_summary_view TO "erik.michaelson@taranginc.com";
+GRANT SELECT ON wavze1.kpi_summary_view TO "kevin.soderholm@taranginc.com";
+GRANT SELECT ON wavze1.kpi_summary_view TO "jagadeesh.pasupulati@taranginc.com";
+GRANT SELECT ON wavze1.kpi_summary_view TO "wavze1@wavze1db2";
 
 
 

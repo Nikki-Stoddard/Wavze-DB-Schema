@@ -1,8 +1,8 @@
--- Table: wavzedemo.transaction
+-- Table: wavze1.transaction
 
--- DROP TABLE IF EXISTS wavzedemo.transaction;
+-- DROP TABLE IF EXISTS wavze1.transaction;
 
-CREATE TABLE wavzedemo.transaction (
+CREATE TABLE wavze1.transaction (
     transaction_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     customer_id uuid NOT NULL,
     property_id uuid,
@@ -25,28 +25,28 @@ CREATE TABLE wavzedemo.transaction (
 );
 
 
-ALTER TABLE wavzedemo.transaction OWNER TO "nikki.stoddard@taranginc.com";
+ALTER TABLE wavze1.transaction OWNER TO "nikki.stoddard@taranginc.com";
 
 --
--- Name: transaction transaction_pkey; Type: CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction transaction_pkey; Type: CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-ALTER TABLE ONLY wavzedemo.transaction
+ALTER TABLE ONLY wavze1.transaction
     ADD CONSTRAINT transaction_pkey PRIMARY KEY (transaction_id);
 
 
 --
--- Name: transaction inactive_status; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction inactive_status; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER inactive_status BEFORE INSERT OR UPDATE ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_active_check();
+CREATE TRIGGER inactive_status BEFORE INSERT OR UPDATE ON wavze1.transaction FOR EACH ROW EXECUTE FUNCTION wavze1.transaction_active_check();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.transaction_active_check()
+-- FUNCTION: wavze1.transaction_active_check()
 
--- DROP FUNCTION IF EXISTS wavzedemo.transaction_active_check();
+-- DROP FUNCTION IF EXISTS wavze1.transaction_active_check();
 
-CREATE OR REPLACE FUNCTION wavzedemo.transaction_active_check()
+CREATE OR REPLACE FUNCTION wavze1.transaction_active_check()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -63,17 +63,17 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- Name: transaction set_product_id; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction set_product_id; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER set_product_id BEFORE INSERT OR UPDATE ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.product_id_lookup();
+CREATE TRIGGER set_product_id BEFORE INSERT OR UPDATE ON wavze1.transaction FOR EACH ROW EXECUTE FUNCTION wavze1.product_id_lookup();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.product_id_lookup()
+-- FUNCTION: wavze1.product_id_lookup()
 
--- DROP FUNCTION IF EXISTS wavzedemo.product_id_lookup();
+-- DROP FUNCTION IF EXISTS wavze1.product_id_lookup();
 
-CREATE OR REPLACE FUNCTION wavzedemo.product_id_lookup()
+CREATE OR REPLACE FUNCTION wavze1.product_id_lookup()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -89,7 +89,7 @@ BEGIN
 			p.product_id
 		INTO
 			v_product_id
-		FROM wavzedemo.product p
+		FROM wavze1.product p
 		WHERE p.product_category = NEW.product_category
 		AND p.product_name = NEW.product_name;
 
@@ -111,17 +111,17 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- Name: transaction transaction_created_ts; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction transaction_created_ts; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER transaction_created_ts BEFORE INSERT ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.set_created_ts();
+CREATE TRIGGER transaction_created_ts BEFORE INSERT ON wavze1.transaction FOR EACH ROW EXECUTE FUNCTION wavze1.set_created_ts();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.set_created_ts()
+-- FUNCTION: wavze1.set_created_ts()
 
--- DROP FUNCTION IF EXISTS wavzedemo.set_created_ts();
+-- DROP FUNCTION IF EXISTS wavze1.set_created_ts();
 
-CREATE OR REPLACE FUNCTION wavzedemo.set_created_ts()
+CREATE OR REPLACE FUNCTION wavze1.set_created_ts()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -137,17 +137,17 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- Name: transaction transaction_dup_flag; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction transaction_dup_flag; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER transaction_dup_flag AFTER INSERT OR UPDATE ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_dup_check();
+CREATE TRIGGER transaction_dup_flag AFTER INSERT OR UPDATE ON wavze1.transaction FOR EACH ROW EXECUTE FUNCTION wavze1.transaction_dup_check();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.transaction_dup_check()
+-- FUNCTION: wavze1.transaction_dup_check()
 
--- DROP FUNCTION IF EXISTS wavzedemo.transaction_dup_check();
+-- DROP FUNCTION IF EXISTS wavze1.transaction_dup_check();
 
-CREATE OR REPLACE FUNCTION wavzedemo.transaction_dup_check()
+CREATE OR REPLACE FUNCTION wavze1.transaction_dup_check()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -160,7 +160,7 @@ BEGIN
 	-- check for existing transactions with same customer_id and product_id within specified time window
 	SELECT COUNT(*) 
 	INTO v_duplicate_count
-	FROM wavzedemo.transaction
+	FROM wavze1.transaction
 	WHERE customer_id = NEW.customer_id
 	AND product_id = NEW.product_id
 	AND active = TRUE
@@ -171,7 +171,7 @@ BEGIN
 	IF v_duplicate_count > 0 THEN NEW.duplicate := TRUE;
 
 		-- update existing duplicate transactions to flag
-		UPDATE wavzedemo.transaction
+		UPDATE wavze1.transaction
 		SET duplicate = TRUE
 		WHERE customer_id = NEW.customer_id
 		AND product_id = NEW.product_id
@@ -190,24 +190,24 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- Name: transaction transaction_id_detail; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction transaction_id_detail; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER transaction_id_detail BEFORE INSERT ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_detail_uuid();
+CREATE TRIGGER transaction_id_detail BEFORE INSERT ON wavze1.transaction FOR EACH ROW EXECUTE FUNCTION wavze1.transaction_detail_uuid();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.transaction_detail_uuid()
+-- FUNCTION: wavze1.transaction_detail_uuid()
 
--- DROP FUNCTION IF EXISTS wavzedemo.transaction_detail_uuid();
+-- DROP FUNCTION IF EXISTS wavze1.transaction_detail_uuid();
 
-CREATE OR REPLACE FUNCTION wavzedemo.transaction_detail_uuid()
+CREATE OR REPLACE FUNCTION wavze1.transaction_detail_uuid()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE NOT LEAKPROOF
 AS $BODY$
 BEGIN
-	INSERT INTO wavzedemo.transaction_detail (transaction_id)
+	INSERT INTO wavze1.transaction_detail (transaction_id)
 	VALUES (NEW.transaction_id);
 	RETURN NEW;
 END;
@@ -215,24 +215,24 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- Name: transaction transaction_id_milestone_kpi; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction transaction_id_milestone_kpi; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER transaction_id_milestone BEFORE INSERT ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.transaction_milestone_kpi_uuid();
+CREATE TRIGGER transaction_id_milestone BEFORE INSERT ON wavze1.transaction FOR EACH ROW EXECUTE FUNCTION wavze1.transaction_milestone_kpi_uuid();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.transaction_milestone_kpi_uuid()
+-- FUNCTION: wavze1.transaction_milestone_kpi_uuid()
 
--- DROP FUNCTION IF EXISTS wavzedemo.transaction_milestone_kpi_uuid();
+-- DROP FUNCTION IF EXISTS wavze1.transaction_milestone_kpi_uuid();
 
-CREATE OR REPLACE FUNCTION wavzedemo.transaction_milestone_kpi_uuid()
+CREATE OR REPLACE FUNCTION wavze1.transaction_milestone_kpi_uuid()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE NOT LEAKPROOF
 AS $BODY$
 BEGIN
-	INSERT INTO wavzedemo.transaction_milestone_kpi (transaction_id)
+	INSERT INTO wavze1.transaction_milestone_kpi (transaction_id)
 	VALUES (NEW.transaction_id);
 	RETURN NEW;
 END;
@@ -240,17 +240,17 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- Name: transaction transaction_track_history; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction transaction_track_history; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-CREATE TRIGGER transaction_track_history AFTER INSERT OR DELETE OR UPDATE ON wavzedemo.transaction FOR EACH ROW EXECUTE FUNCTION wavzedemo.track_transaction1_field_changes();
+CREATE TRIGGER transaction_track_history AFTER INSERT OR DELETE OR UPDATE ON wavze1.transaction FOR EACH ROW EXECUTE FUNCTION wavze1.track_transaction1_field_changes();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.track_transaction1_field_changes()
+-- FUNCTION: wavze1.track_transaction1_field_changes()
 
--- DROP FUNCTION IF EXISTS wavzedemo.track_transaction1_field_changes();
+-- DROP FUNCTION IF EXISTS wavze1.track_transaction1_field_changes();
 
-CREATE OR REPLACE FUNCTION wavzedemo.track_transaction1_field_changes()
+CREATE OR REPLACE FUNCTION wavze1.track_transaction1_field_changes()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -282,7 +282,7 @@ BEGIN
 			data_type,
 			udt_name
 		FROM information_schema.columns
-		WHERE table_schema = 'wavzedemo'
+		WHERE table_schema = 'wavze1'
 		AND table_name = 'transaction'
 		AND column_name NOT IN ('transaction_id','created_ts','created_by','modified_ts','modified_by')
 	LOOP
@@ -295,7 +295,7 @@ BEGIN
 
 			-- only record non-NULL values
 			IF new_val IS NOT NULL AND new_val != 'null'::JSONB THEN
-				INSERT INTO wavzedemo.transaction_hist (
+				INSERT INTO wavze1.transaction_hist (
 					transaction_id,
 					operation,
 					field_name,
@@ -319,7 +319,7 @@ BEGIN
 
 			-- check if value changed
 			IF old_val IS DISTINCT FROM new_val THEN
-				INSERT INTO wavzedemo.transaction_hist (
+				INSERT INTO wavze1.transaction_hist (
 					transaction_id,
 					operation,
 					field_name,
@@ -342,7 +342,7 @@ BEGIN
 		ELSIF TG_OP = 'DELETE' THEN
 			old_val := old_json->field_name;
 
-			INSERT INTO wavzedemo.transaction_hist (
+			INSERT INTO wavze1.transaction_hist (
 				transaction_id,
 				operation,
 				field_name,
@@ -372,43 +372,43 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- Name: transaction customer_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction customer_id; Type: FK CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-ALTER TABLE ONLY wavzedemo.transaction
-    ADD CONSTRAINT customer_id FOREIGN KEY (customer_id) REFERENCES wavzedemo.customer(customer_id) NOT VALID;
-
-
---
--- Name: transaction product_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
---
-
-ALTER TABLE ONLY wavzedemo.transaction
-    ADD CONSTRAINT product_id FOREIGN KEY (product_id) REFERENCES wavzedemo.product(product_id) NOT VALID;
+ALTER TABLE ONLY wavze1.transaction
+    ADD CONSTRAINT customer_id FOREIGN KEY (customer_id) REFERENCES wavze1.customer(customer_id) NOT VALID;
 
 
 --
--- Name: transaction property_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction product_id; Type: FK CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-ALTER TABLE ONLY wavzedemo.transaction
-    ADD CONSTRAINT property_id FOREIGN KEY (property_id) REFERENCES wavzedemo.property(property_id) NOT VALID;
-
-
---
--- Name: transaction user_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
---
-
-ALTER TABLE ONLY wavzedemo.transaction
-    ADD CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES wavzedemo.wavze_user(user_id) NOT VALID;
+ALTER TABLE ONLY wavze1.transaction
+    ADD CONSTRAINT product_id FOREIGN KEY (product_id) REFERENCES wavze1.product(product_id) NOT VALID;
 
 
 --
--- Name: TABLE transaction; Type: ACL; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: transaction property_id; Type: FK CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.transaction TO "erik.michaelson@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.transaction TO "kevin.soderholm@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.transaction TO "jagadeesh.pasupulati@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.transaction TO "wavzedemo@wavzedemodb2";
+ALTER TABLE ONLY wavze1.transaction
+    ADD CONSTRAINT property_id FOREIGN KEY (property_id) REFERENCES wavze1.property(property_id) NOT VALID;
+
+
+--
+-- Name: transaction user_id; Type: FK CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
+--
+
+ALTER TABLE ONLY wavze1.transaction
+    ADD CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES wavze1.wavze_user(user_id) NOT VALID;
+
+
+--
+-- Name: TABLE transaction; Type: ACL; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
+--
+
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.transaction TO "erik.michaelson@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.transaction TO "kevin.soderholm@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.transaction TO "jagadeesh.pasupulati@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.transaction TO "wavze1@wavze1db2";
 

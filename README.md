@@ -76,13 +76,13 @@ This project contains a complete PostgreSQL database schema for managing custome
 ```sql
 -- Connect to your PostgreSQL server
 -- Create the database (if it doesn't exist)
-CREATE DATABASE wavzedemo;
+CREATE DATABASE wavze1;
 
 -- Connect to the database
-\c wavzedemo
+\c wavze1
 
 -- Create the schema
-CREATE SCHEMA wavzedemo;
+CREATE SCHEMA wavze1;
 
 -- Ensure UUID extension is available
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -95,9 +95,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE USER "your-email@example.com" WITH PASSWORD 'your-password';
 
 -- Grant necessary privileges
-GRANT ALL PRIVILEGES ON SCHEMA wavzedemo TO "your-email@example.com";
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA wavzedemo TO "your-email@example.com";
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA wavzedemo TO "your-email@example.com";
+GRANT ALL PRIVILEGES ON SCHEMA wavze1 TO "your-email@example.com";
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA wavze1 TO "your-email@example.com";
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA wavze1 TO "your-email@example.com";
 ```
 
 ### Step 3: Execute SQL Files
@@ -132,19 +132,19 @@ Execute the SQL files in the following order to ensure dependencies are met:
 cd /path/to/Wavze-DB-Schema
 
 # Execute files in order
-psql -U your-username -d wavzedemo -f wavze_user.sql
-psql -U your-username -d wavzedemo -f property.sql
-psql -U your-username -d wavzedemo -f customer.sql
-psql -U your-username -d wavzedemo -f product.sql
-psql -U your-username -d wavzedemo -f transaction.sql
-psql -U your-username -d wavzedemo -f transaction_detail.sql
-psql -U your-username -d wavzedemo -f property_rltn.sql
-psql -U your-username -d wavzedemo -f customer_hist.sql
-psql -U your-username -d wavzedemo -f product_hist.sql
-psql -U your-username -d wavzedemo -f transaction_hist.sql
-psql -U your-username -d wavzedemo -f property_hist.sql
-psql -U your-username -d wavzedemo -f transaction_milestone_kpi.sql
-psql -U your-username -d wavzedemo -f kpi_ytd_by_user.sql
+psql -U your-username -d wavze1 -f wavze_user.sql
+psql -U your-username -d wavze1 -f property.sql
+psql -U your-username -d wavze1 -f customer.sql
+psql -U your-username -d wavze1 -f product.sql
+psql -U your-username -d wavze1 -f transaction.sql
+psql -U your-username -d wavze1 -f transaction_detail.sql
+psql -U your-username -d wavze1 -f property_rltn.sql
+psql -U your-username -d wavze1 -f customer_hist.sql
+psql -U your-username -d wavze1 -f product_hist.sql
+psql -U your-username -d wavze1 -f transaction_hist.sql
+psql -U your-username -d wavze1 -f property_hist.sql
+psql -U your-username -d wavze1 -f transaction_milestone_kpi.sql
+psql -U your-username -d wavze1 -f kpi_ytd_by_user.sql
 ```
 
 ## Usage
@@ -154,7 +154,7 @@ psql -U your-username -d wavzedemo -f kpi_ytd_by_user.sql
 #### Creating a Customer
 
 ```sql
-INSERT INTO wavzedemo.customer (
+INSERT INTO wavze1.customer (
     first_name,
     last_name,
     email,
@@ -174,7 +174,7 @@ INSERT INTO wavzedemo.customer (
 #### Creating a Product
 
 ```sql
-INSERT INTO wavzedemo.product (
+INSERT INTO wavze1.product (
     product_category,
     product_name,
     product_active,
@@ -190,7 +190,7 @@ INSERT INTO wavzedemo.product (
 #### Creating a Transaction
 
 ```sql
-INSERT INTO wavzedemo.transaction (
+INSERT INTO wavze1.transaction (
     customer_id,
     product_category,
     product_name,
@@ -212,7 +212,7 @@ INSERT INTO wavzedemo.transaction (
 #### Creating a Property
 
 ```sql
-INSERT INTO wavzedemo.property (
+INSERT INTO wavze1.property (
     street_addr1,
     city,
     state,
@@ -234,7 +234,7 @@ INSERT INTO wavzedemo.property (
 #### Linking Property to Customer
 
 ```sql
-INSERT INTO wavzedemo.property_rltn (
+INSERT INTO wavze1.property_rltn (
     property_id,
     customer_id,
     occupancy
@@ -262,8 +262,8 @@ SELECT
     ch.new_value,
     ch.modified_ts,
     c.first_name || ' ' || c.last_name AS customer_name
-FROM wavzedemo.customer_hist ch
-JOIN wavzedemo.customer c ON c.customer_id = ch.customer_id
+FROM wavze1.customer_hist ch
+JOIN wavze1.customer c ON c.customer_id = ch.customer_id
 WHERE ch.customer_id = 'customer-uuid-here'
 ORDER BY ch.modified_ts DESC;
 ```
@@ -278,7 +278,7 @@ SELECT
     th.old_value,
     th.new_value,
     th.modified_ts
-FROM wavzedemo.transaction_hist th
+FROM wavze1.transaction_hist th
 WHERE th.transaction_id = 'transaction-uuid-here'
 ORDER BY th.modified_ts DESC;
 ```
@@ -380,18 +380,18 @@ Manages customer-property relationships.
 
 ### Automatic Timestamp Management
 
-**Function**: `wavzedemo.set_created_ts()`
+**Function**: `wavze1.set_created_ts()`
 - Automatically sets `created_ts` to current timestamp if NULL on INSERT
 - Applied to: customer, product, property, transaction, transaction_detail, property_rltn
 
 ### History Tracking
 
 **Functions**: 
-- `wavzedemo.track_customer_field_changes()`
-- `wavzedemo.track_product_field_changes()`
-- `wavzedemo.track_transaction1_field_changes()`
-- `wavzedemo.track_transaction2_field_changes()`
-- `wavzedemo.track_property_field_changes()`
+- `wavze1.track_customer_field_changes()`
+- `wavze1.track_product_field_changes()`
+- `wavze1.track_transaction1_field_changes()`
+- `wavze1.track_transaction2_field_changes()`
+- `wavze1.track_property_field_changes()`
 
 These functions automatically log all field changes to respective history tables, storing:
 - Operation type (INSERT, UPDATE, DELETE)
@@ -401,44 +401,44 @@ These functions automatically log all field changes to respective history tables
 
 ### Duplicate Detection
 
-**Function**: `wavzedemo.customer_uuid_dup_check()`
+**Function**: `wavze1.customer_uuid_dup_check()`
 - Prevents duplicate customers based on name, email, or phone number
 - Raises exception if duplicate found
 
-**Function**: `wavzedemo.transaction_dup_check()`
+**Function**: `wavze1.transaction_dup_check()`
 - Flags duplicate transactions (same customer + product + active status)
 - Sets `duplicate = TRUE` on all related transactions
 
 ### Product Lookup
 
-**Function**: `wavzedemo.product_id_lookup()`
+**Function**: `wavze1.product_id_lookup()`
 - Automatically resolves `product_id` from `product_category` and `product_name`
 - Raises exception if product not found
 
 ### Transaction Status Management
 
-**Function**: `wavzedemo.transaction_active_check()`
+**Function**: `wavze1.transaction_active_check()`
 - Automatically sets `active = FALSE` when milestone contains "CLOSED" or "FUNDED"
 
 ### Property Relationship Management
 
-**Function**: `wavzedemo.set_prim_residence_from_occupancy()`
+**Function**: `wavze1.set_prim_residence_from_occupancy()`
 - Sets `prim_residence = TRUE` when `occupancy = 'Primary Residence'`
 
-**Function**: `wavzedemo.update_customer_prim_residence()`
+**Function**: `wavze1.update_customer_prim_residence()`
 - Automatically updates customer's `property_id` and address when primary residence changes
 - Handles deletion of primary residence relationships
 
 ### Transaction Detail Auto-Creation
 
 **Functions**: 
-- `wavzedemo.transaction_detail_uuid()`
-- `wavzedemo.transaction_milestone_kpi_uuid()`
+- `wavze1.transaction_detail_uuid()`
+- `wavze1.transaction_milestone_kpi_uuid()`
 - Automatically creates a corresponding `transaction_detail` and `transaction_milestone_kpi` record when a transaction is created
 
 ### Last Modified Updates
 
-**Function**: `wavzedemo.update_customer_last_modified()`
+**Function**: `wavze1.update_customer_last_modified()`
 - Updates customer's `modified_ts` and `modified_by` from latest history record
 
 ## Data Files
@@ -502,7 +502,7 @@ SELECT
     total_loan_amount,
     overall_approval_rate_pct,
     overall_close_rate_pct
-FROM wavzedemo.kpi_summary_view
+FROM wavze1.kpi_summary_view
 WHERE transaction_month >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '12 months')
 ORDER BY product_category, transaction_month DESC;
 ```
@@ -511,8 +511,8 @@ ORDER BY product_category, transaction_month DESC;
 
 Execute the KPI view files after creating the base schema:
 ```bash
-psql -U your-username -d wavzedemo -f kpi_aggregate_view.sql
-psql -U your-username -d wavzedemo -f kpi_summary_view.sql
+psql -U your-username -d wavze1 -f kpi_aggregate_view.sql
+psql -U your-username -d wavze1 -f kpi_summary_view.sql
 ```
 
 ## Contributing
@@ -551,7 +551,7 @@ We welcome contributions to improve this database schema! Please follow these gu
 - Follow PostgreSQL naming conventions:
   - Table names: lowercase, singular (e.g., `customer`, `transaction`)
   - Column names: lowercase, snake_case (e.g., `customer_id`, `created_ts`)
-  - Function names: schema-prefixed, descriptive (e.g., `wavzedemo.set_created_ts()`)
+  - Function names: schema-prefixed, descriptive (e.g., `wavze1.set_created_ts()`)
 
 ### Testing Guidelines
 

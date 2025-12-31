@@ -1,4 +1,4 @@
--- View: wavzedemo.kpi_aggregate_view
+-- View: wavze1.kpi_aggregate_view
 -- 
 -- Dynamic KPI Aggregate View for Transaction Analytics
 -- 
@@ -6,9 +6,9 @@
 -- automatically aggregating relevant fields based on product categories.
 -- The view groups data by product_category, milestone, source, and time dimensions.
 --
--- DROP VIEW IF EXISTS wavzedemo.kpi_aggregate_view;
+-- DROP VIEW IF EXISTS wavze1.kpi_aggregate_view;
 
-CREATE OR REPLACE VIEW wavzedemo.kpi_aggregate_view AS
+CREATE OR REPLACE VIEW wavze1.kpi_aggregate_view AS
 SELECT 
     -- Dimension Fields
     t.product_category,
@@ -124,8 +124,8 @@ SELECT
         ELSE NULL
     END AS funded_rate_pct
 
-FROM wavzedemo.transaction t
-LEFT JOIN wavzedemo.transaction_detail td ON t.transaction_id = td.transaction_id
+FROM wavze1.transaction t
+LEFT JOIN wavze1.transaction_detail td ON t.transaction_id = td.transaction_id
 WHERE t.product_category IS NOT NULL
 GROUP BY 
     t.product_category,
@@ -138,12 +138,12 @@ GROUP BY
     DATE_TRUNC('year', t.created_ts);
 
 -- Add comment
-COMMENT ON VIEW wavzedemo.kpi_aggregate_view IS 
+COMMENT ON VIEW wavze1.kpi_aggregate_view IS 
 'Dynamic KPI Aggregate View providing comprehensive transaction analytics aggregated by product category, milestone, source, and time dimensions. Includes transaction counts, financial aggregations, conversion metrics, and distribution statistics.';
 
 -- Grant permissions (adjust users as needed)
-GRANT SELECT ON wavzedemo.kpi_aggregate_view TO "erik.michaelson@taranginc.com";
-GRANT SELECT ON wavzedemo.kpi_aggregate_view TO "kevin.soderholm@taranginc.com";
-GRANT SELECT ON wavzedemo.kpi_aggregate_view TO "jagadeesh.pasupulati@taranginc.com";
-GRANT SELECT ON wavzedemo.kpi_aggregate_view TO "wavzedemo@wavzedemodb2";
+GRANT SELECT ON wavze1.kpi_aggregate_view TO "erik.michaelson@taranginc.com";
+GRANT SELECT ON wavze1.kpi_aggregate_view TO "kevin.soderholm@taranginc.com";
+GRANT SELECT ON wavze1.kpi_aggregate_view TO "jagadeesh.pasupulati@taranginc.com";
+GRANT SELECT ON wavze1.kpi_aggregate_view TO "wavze1@wavze1db2";
 

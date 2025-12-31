@@ -1,9 +1,9 @@
 
--- Table: wavzedemo.customer
+-- Table: wavze1.customer
 
--- DROP TABLE IF EXISTS wavzedemo.customer;
+-- DROP TABLE IF EXISTS wavze1.customer;
 
-CREATE TABLE wavzedemo.customer (
+CREATE TABLE wavze1.customer (
     customer_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     property_id uuid,
     created_ts timestamp with time zone,
@@ -39,38 +39,38 @@ CREATE TABLE wavzedemo.customer (
 );
 
 
-ALTER TABLE wavzedemo.customer OWNER TO "nikki.stoddard@taranginc.com";
+ALTER TABLE wavze1.customer OWNER TO "nikki.stoddard@taranginc.com";
 
 --
 -- TOC entry 4413 (class 0 OID 0)
 -- Dependencies: 257
--- Name: COLUMN customer.property_id; Type: COMMENT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: COLUMN customer.property_id; Type: COMMENT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-COMMENT ON COLUMN wavzedemo.customer.property_id IS 'primary residence';
+COMMENT ON COLUMN wavze1.customer.property_id IS 'primary residence';
 
 
 --
 -- TOC entry 4253 (class 2606 OID 25621)
--- Name: customer customer_pkey; Type: CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: customer customer_pkey; Type: CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-ALTER TABLE ONLY wavzedemo.customer
+ALTER TABLE ONLY wavze1.customer
     ADD CONSTRAINT customer_pkey PRIMARY KEY (customer_id);
 
 
 --
 -- TOC entry 4256 (class 2620 OID 25632)
--- Name: customer customer_created_ts; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: customer customer_created_ts; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 
-CREATE TRIGGER customer_created_ts BEFORE INSERT ON wavzedemo.customer FOR EACH ROW EXECUTE FUNCTION wavzedemo.set_created_ts();
+CREATE TRIGGER customer_created_ts BEFORE INSERT ON wavze1.customer FOR EACH ROW EXECUTE FUNCTION wavze1.set_created_ts();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.set_created_ts()
+-- FUNCTION: wavze1.set_created_ts()
 
--- DROP FUNCTION IF EXISTS wavzedemo.set_created_ts();
+-- DROP FUNCTION IF EXISTS wavze1.set_created_ts();
 
-CREATE OR REPLACE FUNCTION wavzedemo.set_created_ts()
+CREATE OR REPLACE FUNCTION wavze1.set_created_ts()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -87,16 +87,16 @@ $BODY$;
 
 
 -- TOC entry 4257 (class 2620 OID 26147)
--- Name: customer customer_uuid; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: customer customer_uuid; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 
-CREATE TRIGGER customer_uuid BEFORE INSERT OR UPDATE ON wavzedemo.customer FOR EACH ROW EXECUTE FUNCTION wavzedemo.customer_uuid_dup_check();
+CREATE TRIGGER customer_uuid BEFORE INSERT OR UPDATE ON wavze1.customer FOR EACH ROW EXECUTE FUNCTION wavze1.customer_uuid_dup_check();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.customer_uuid_dup_check()
+-- FUNCTION: wavze1.customer_uuid_dup_check()
 
--- DROP FUNCTION IF EXISTS wavzedemo.customer_uuid_dup_check();
+-- DROP FUNCTION IF EXISTS wavze1.customer_uuid_dup_check();
 
-CREATE OR REPLACE FUNCTION wavzedemo.customer_uuid_dup_check()
+CREATE OR REPLACE FUNCTION wavze1.customer_uuid_dup_check()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -108,7 +108,7 @@ BEGIN
 	-- check if customer_id with same name, email, and phone number already exists
 	SELECT customer_id
 	INTO v_existing_customer_id
-	FROM wavzedemo.customer
+	FROM wavze1.customer
 	WHERE 
 		-- check name (case-insensitive, trim whitespace)
 		LOWER(TRIM(COALESCE(first_name, ''))) = LOWER(TRIM(COALESCE(NEW.first_name, '')))
@@ -142,16 +142,16 @@ $BODY$;
 
 
 -- TOC entry 4258 (class 2620 OID 26206)
--- Name: customer track_customer_history; Type: TRIGGER; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: customer track_customer_history; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 
-CREATE TRIGGER track_customer_history AFTER INSERT OR DELETE OR UPDATE ON wavzedemo.customer FOR EACH ROW EXECUTE FUNCTION wavzedemo.track_customer_field_changes();
+CREATE TRIGGER track_customer_history AFTER INSERT OR DELETE OR UPDATE ON wavze1.customer FOR EACH ROW EXECUTE FUNCTION wavze1.track_customer_field_changes();
 
 /*********************************************************************************************************************************************************************
--- FUNCTION: wavzedemo.track_customer_field_changes()
+-- FUNCTION: wavze1.track_customer_field_changes()
 
--- DROP FUNCTION IF EXISTS wavzedemo.track_customer_field_changes();
+-- DROP FUNCTION IF EXISTS wavze1.track_customer_field_changes();
 
-CREATE OR REPLACE FUNCTION wavzedemo.track_customer_field_changes()
+CREATE OR REPLACE FUNCTION wavze1.track_customer_field_changes()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
@@ -183,7 +183,7 @@ BEGIN
 			data_type,
 			udt_name
 		FROM information_schema.columns
-		WHERE table_schema = 'wavzedemo'
+		WHERE table_schema = 'wavze1'
 		AND table_name = 'customer'
 		AND column_name NOT IN ('customer_hist_id','customer_id','created_ts','created_by','modified_ts','modified_by')
 	LOOP
@@ -196,7 +196,7 @@ BEGIN
 
 			-- only record non-NULL values
 			IF new_val IS NOT NULL AND new_val != 'null'::JSONB THEN
-				INSERT INTO wavzedemo.customer_hist (
+				INSERT INTO wavze1.customer_hist (
 					customer_id,
 					operation,
 					field_name,
@@ -220,7 +220,7 @@ BEGIN
 
 			-- check if value changed
 			IF old_val IS DISTINCT FROM new_val THEN
-				INSERT INTO wavzedemo.customer_hist (
+				INSERT INTO wavze1.customer_hist (
 					customer_id,
 					operation,
 					field_name,
@@ -243,7 +243,7 @@ BEGIN
 		ELSIF TG_OP = 'DELETE' THEN
 			old_val := old_json->field_name;
 
-			INSERT INTO wavzedemo.customer_hist (
+			INSERT INTO wavze1.customer_hist (
 				customer_id,
 				operation,
 				field_name,
@@ -274,30 +274,30 @@ $BODY$;
 
 
 -- TOC entry 4254 (class 2606 OID 25622)
--- Name: customer created_by; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: customer created_by; Type: FK CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-ALTER TABLE ONLY wavzedemo.customer
-    ADD CONSTRAINT created_by FOREIGN KEY (created_by) REFERENCES wavzedemo.wavze_user(user_id);
+ALTER TABLE ONLY wavze1.customer
+    ADD CONSTRAINT created_by FOREIGN KEY (created_by) REFERENCES wavze1.wavze_user(user_id);
 
 
 --
 -- TOC entry 4255 (class 2606 OID 25627)
--- Name: customer property_id; Type: FK CONSTRAINT; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: customer property_id; Type: FK CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-ALTER TABLE ONLY wavzedemo.customer
-    ADD CONSTRAINT property_id FOREIGN KEY (property_id) REFERENCES wavzedemo.property(property_id);
+ALTER TABLE ONLY wavze1.customer
+    ADD CONSTRAINT property_id FOREIGN KEY (property_id) REFERENCES wavze1.property(property_id);
 
 
 --
 -- TOC entry 4414 (class 0 OID 0)
 -- Dependencies: 257
--- Name: TABLE customer; Type: ACL; Schema: wavzedemo; Owner: nikki.stoddard@taranginc.com
+-- Name: TABLE customer; Type: ACL; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.customer TO "erik.michaelson@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.customer TO "jagadeesh.pasupulati@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.customer TO "kevin.soderholm@taranginc.com";
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavzedemo.customer TO "wavzedemo@wavzedemodb2";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.customer TO "erik.michaelson@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.customer TO "jagadeesh.pasupulati@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.customer TO "kevin.soderholm@taranginc.com";
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE wavze1.customer TO "wavze1@wavze1db2";
 
