@@ -43,6 +43,8 @@ This project contains a complete PostgreSQL database schema for managing custome
 
 - **wavze_user**: System users and administrators
 - **customer**: Customer information and demographics
+- **interaction**: Record of Wavze user interactions
+- **interaction_rltn**: Customer-interaction relationships
 - **product**: Product catalog with categories
 - **property**: Property/real estate information
 - **transaction**: Main transaction records
@@ -61,6 +63,10 @@ This project contains a complete PostgreSQL database schema for managing custome
 
 ### Reporting Materialized View
 - **kpi_ytd_by_user**: Banking-specific aggregated milestone KPIs (fields will change for each industry template)
+
+### Wavze Application Tracking Tables
+- **application_properties**: API, DB URLs, etc.
+- **ai_assistant**: Chatbot prompt data capture
 
 ## Prerequisites
 
@@ -115,8 +121,12 @@ Execute the SQL files in the following order to ensure dependencies are met:
 9. **product_hist.sql** - Product history (depends on product, wavze_user)
 10. **transaction_hist.sql** - Transaction history (depends on transaction, wavze_user)
 11. **property_hist.sql** - Property history (depends on property, wavze_user)
-12. **transaction_milestone_kpi.sql** - Milestone KPI flags (depends on transaction, customer)
-13. **kpi_ytd_by_user.sql** - Aggregated KPI view 
+12. **interaction.sql** - Interaction table (no dependencies)
+13. **interaction_rltn.sql** - Interaction relationships (depends on wavze_user, customer)
+14. **transaction_milestone_kpi.sql** - Milestone KPI flags (depends on transaction, customer)
+15. **kpi_ytd_by_user.sql** - Aggregated KPI view (depends on transaction_milestone_kpi)
+16. **ai_assistant.sql** - AI chatbot assistant table (no dependencies)
+17. **application_properties.sql** - Application properties table (no dependencies)
 
 ### Using pgAdmin 4
 
@@ -143,8 +153,12 @@ psql -U your-username -d wavze1 -f customer_hist.sql
 psql -U your-username -d wavze1 -f product_hist.sql
 psql -U your-username -d wavze1 -f transaction_hist.sql
 psql -U your-username -d wavze1 -f property_hist.sql
+psql -U your-username -d wavze1 -f interaction.sql
+psql -U your-username -d wavze1 -f interaction_rltn.sql
 psql -U your-username -d wavze1 -f transaction_milestone_kpi.sql
 psql -U your-username -d wavze1 -f kpi_ytd_by_user.sql
+psql -U your-username -d wavze1 -f ai_assistant.sql
+psql -U your-username -d wavze1 -f application_properties.sql
 ```
 
 ## Usage
