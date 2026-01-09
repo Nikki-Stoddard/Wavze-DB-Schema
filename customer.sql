@@ -1,4 +1,3 @@
-
 -- Table: wavze1.customer
 
 -- DROP TABLE IF EXISTS wavze1.customer;
@@ -34,6 +33,11 @@ CREATE TABLE wavze1.customer (
     occupation text,
     annual_income numeric,
     est_credit_range character varying(20),
+	orig_source character varying(30) COLLATE pg_catalog."default",
+    first_contact_dt date,
+    last_contact_dt date,
+    rltn_owner_id uuid,
+    rltn_owner_name text COLLATE pg_catalog."default",
     modified_ts timestamp with time zone,
     modified_by uuid
 );
@@ -42,26 +46,21 @@ CREATE TABLE wavze1.customer (
 ALTER TABLE wavze1.customer OWNER TO "nikki.stoddard@taranginc.com";
 
 --
--- TOC entry 4413 (class 0 OID 0)
--- Dependencies: 257
 -- Name: COLUMN customer.property_id; Type: COMMENT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
 COMMENT ON COLUMN wavze1.customer.property_id IS 'primary residence';
 
-
 --
--- TOC entry 4253 (class 2606 OID 25621)
 -- Name: customer customer_pkey; Type: CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
 ALTER TABLE ONLY wavze1.customer
     ADD CONSTRAINT customer_pkey PRIMARY KEY (customer_id);
 
-
 --
--- TOC entry 4256 (class 2620 OID 25632)
 -- Name: customer customer_created_ts; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
+--
 
 CREATE TRIGGER customer_created_ts BEFORE INSERT ON wavze1.customer FOR EACH ROW EXECUTE FUNCTION wavze1.set_created_ts();
 
@@ -85,9 +84,9 @@ END;
 $BODY$;
 *********************************************************************************************************************************************************************/
 
-
--- TOC entry 4257 (class 2620 OID 26147)
+--
 -- Name: customer customer_uuid; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
+--
 
 CREATE TRIGGER customer_uuid BEFORE INSERT OR UPDATE ON wavze1.customer FOR EACH ROW EXECUTE FUNCTION wavze1.customer_uuid_dup_check();
 
@@ -140,9 +139,56 @@ END;
 $BODY$;
 *********************************************************************************************************************************************************************/
 
+--
+-- Name: customer set_rltn_owner_name; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
+--
 
--- TOC entry 4258 (class 2620 OID 26206)
+CREATE TRIGGER set_rltn_owner_name BEFORE INSERT OR UPDATE ON wavze1.customer FOR EACH ROW EXECUTE FUNCTION wavze1.rltn_owner_name();
+
+/*********************************************************************************************************************************************************************
+-- FUNCTION: wavze1.rltn_owner_name()
+
+-- DROP FUNCTION IF EXISTS wavze1.rltn_owner_name();
+
+CREATE OR REPLACE FUNCTION wavze1.rltn_owner_name()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+DECLARE
+	v_owner_name TEXT;
+BEGIN
+	-- only perform lookup if wavze user id is populated
+	IF NEW.rltn_owner_id IS NOT NULL THEN
+		-- lookup user_id from wavze_user table
+		SELECT 
+			first_name || ' ' || last_name 
+		INTO
+			v_owner_name
+		FROM wavze1.wavze_user
+		WHERE user_id = NEW.rltn_owner_id;
+
+		-- if wavze user found, populate owner name
+		IF FOUND THEN
+			NEW.rltn_owner_name := v_owner_name;
+		ELSE
+			-- raise an error
+			RAISE EXCEPTION 'Wavze user name not found for rltn_owner_id %', NEW.rltn_owner_id;
+		END IF;
+	ELSE
+		-- if rltn_owner_id is NULL, clear rltn_owner_id
+		NEW.rltn_owner_id := NULL;
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$;
+*********************************************************************************************************************************************************************/
+
+-- 
 -- Name: customer track_customer_history; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
+--
 
 CREATE TRIGGER track_customer_history AFTER INSERT OR DELETE OR UPDATE ON wavze1.customer FOR EACH ROW EXECUTE FUNCTION wavze1.track_customer_field_changes();
 
@@ -273,7 +319,7 @@ $BODY$;
 *********************************************************************************************************************************************************************/
 
 
--- TOC entry 4254 (class 2606 OID 25622)
+-- 
 -- Name: customer created_by; Type: FK CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -282,7 +328,6 @@ ALTER TABLE ONLY wavze1.customer
 
 
 --
--- TOC entry 4255 (class 2606 OID 25627)
 -- Name: customer property_id; Type: FK CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -291,8 +336,6 @@ ALTER TABLE ONLY wavze1.customer
 
 
 --
--- TOC entry 4414 (class 0 OID 0)
--- Dependencies: 257
 -- Name: TABLE customer; Type: ACL; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 

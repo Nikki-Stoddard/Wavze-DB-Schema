@@ -20,6 +20,10 @@ CREATE TABLE wavze1.transaction (
     sensitive_reason character varying(30),
     active boolean DEFAULT true,
     duplicate boolean DEFAULT false,
+	next_contact_dt date,
+    days_to_contact numeric(3,0),
+    attempt_assigned numeric(2,0),
+    attempt_complete numeric(2,0),
     modified_ts timestamp without time zone,
     modified_by uuid
 );
@@ -62,7 +66,7 @@ END;
 $BODY$;
 *********************************************************************************************************************************************************************/
 
-
+--
 -- Name: transaction set_product_id; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -110,7 +114,7 @@ END;
 $BODY$;
 *********************************************************************************************************************************************************************/
 
-
+--
 -- Name: transaction transaction_created_ts; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -136,7 +140,7 @@ END;
 $BODY$;
 *********************************************************************************************************************************************************************/
 
-
+--
 -- Name: transaction transaction_dup_flag; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -189,7 +193,7 @@ END;
 $BODY$;
 *********************************************************************************************************************************************************************/
 
-
+--
 -- Name: transaction transaction_id_detail; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -214,7 +218,7 @@ END;
 $BODY$;
 *********************************************************************************************************************************************************************/
 
-
+--
 -- Name: transaction transaction_id_milestone_kpi; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -239,7 +243,7 @@ END;
 $BODY$;
 *********************************************************************************************************************************************************************/
 
-
+--
 -- Name: transaction transaction_track_history; Type: TRIGGER; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
@@ -371,7 +375,7 @@ END;
 $BODY$;
 *********************************************************************************************************************************************************************/
 
-
+--
 -- Name: transaction customer_id; Type: FK CONSTRAINT; Schema: wavze1; Owner: nikki.stoddard@taranginc.com
 --
 
